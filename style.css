@@ -1,0 +1,114 @@
+body{
+    background-color: rgb(255, 255, 255);
+    color: rgb(255, 255, 255);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ROW */
+.row {
+    display: flex;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.column {
+    flex: 33.33%;
+    padding: 20px;   
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.error{  
+    z-index:50;
+    position: relative;
+}
+.error p{
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: rgb(255, 92, 92);
+    text-align: center;
+    height: 40px;
+    width: 250px;
+}
+.pokemon{
+    background: rgb(220,255,55);
+    background: linear-gradient(90deg, rgba(220,255,55,1) 0%, rgba(139,253,29,1) 50%, rgba(69,252,235,1) 100%, rgba(220,255,55,1) 0%, rgba(139,253,29,1) 50%, rgba(69,252,235,1) 100%);
+    border-radius: 4%;
+    height: 800px;
+    width: 550px;
+    margin: 0 auto;
+    box-shadow: -1px 1px 23px 12px rgba(222,222,222,1);
+    background-size: 400% 400%;
+    animation: gradient 5s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+.sprite{
+    height: 270px;
+}
+.pokeName{
+    height:  50px;
+}
+
+.hp{
+    height: 40px;
+}
+
+.sprite, .informations{
+   text-align: center;
+}
+
+img{
+    height: 300px;
+}
+
+
+h1{
+    font-size: 50px;
+}
+
+h2{
+    font-size: 30px;
+    height: 18px;
+}
+
+h3{
+    font-size: 18px;
+}
+
+form{
+    height: 50px;
+    width: 400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+input[type=text]{
+    font-size: 20px;
+    margin-bottom:10px;
+    padding: 8px 6px;
+    height: 50px;
+    width:300px;
+}
+
+.searchBar{
+    text-align: center;
+}
