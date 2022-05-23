@@ -1,6 +1,46 @@
-const input = document.getElementsByName('search')
+var path = window.location.pathname;
+var page = path.split("/").pop();
 const mainMenuBtn = document.querySelector(".mainMenu")
 
+mainMenuBtn.addEventListener('click', () => {
+    window.location.assign("/Pages/index.html")
+})
+
+//#region pokedex.html
+if(page == 'pokedex.html'){
+    const input = document.getElementsByName('search')
+
+    input[0].addEventListener('keypress', function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          getPokemon(input[0].value.toLowerCase())
+          input[0].value = ''
+        }
+    });
+    
+}
+//#endregion
+
+//#region Game.html
+if(page == "game.html"){
+    const likeButton = document.querySelector(".like")
+    const dislikeButton = document.querySelector(".dislike")
+
+    getPokemon(Math.floor(Math.random() * 899) + 1)
+
+    likeButton.addEventListener('click', () =>{
+    getPokemon(Math.floor(Math.random() * 899) + 1)
+    })
+
+    dislikeButton.addEventListener('click', () =>{
+        randomNumber = Math.floor(Math.random() * 899) + 1
+        getPokemon(Math.floor(Math.random() * 899) + 1)
+    })
+}
+
+//#endregion
+
+//#region Poke API
 function getPokemon(pokemonName){
     console.log(pokemonName)
     fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
@@ -35,34 +75,7 @@ function getPokemon(pokemonName){
     });
 }
 
-//#region  Buttons
-input[0].addEventListener('keypress', function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      getPokemon(input[0].value.toLowerCase())
-      input[0].value = ''
-    }
-});
-
-mainMenuBtn.addEventListener('click', () => {
-    window.location.assign("/Pages/index.html")
-})
-
 //#endregion
-
-const likeButton = document.querySelector(".like")
-const dislikeButton = document.querySelector(".dislike")
-
-
-likeButton.addEventListener('click', () =>{
-getPokemon(Math.floor(Math.random() * 899) + 1)
-})
-
-dislikeButton.addEventListener('click', () =>{
-    randomNumber = Math.floor(Math.random() * 899) + 1
-    getPokemon(Math.floor(Math.random() * 899) + 1)
-})
-
 
 //#region Alert
 var ALERT_TITLE = "Something went wrong";
