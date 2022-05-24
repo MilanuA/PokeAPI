@@ -16,18 +16,18 @@
                 <button type="button" class="mainMenu">Main Menu</button> 
                 <input type="text" placeholder="Search pokemon" name="search">
             </div>
-            <div class="pokemon">
+            <div class="pokemon" id="pokemonElement">
                 <div class="sprite">           
                 </div>
                 <div class="informations">
                     <div class="pokeName"> </div>  
                     <div class="hp"></div>
-                    <div class="row">
-                        <div class="column height"></div>    
-                        <div class="column types"></div>
-                        <div class="column weight"></div>                           
+                    <div class="row marginTop">
+                        <div class="column height left"></div>    
+                        <div class="column types middle"></div>
+                        <div class="column weight right"></div>                           
                     </div>
-                    <div class="row">
+                    <div class="row marginTop">
                         <div class="column attack"></div>    
                         <div class="column defense"></div>
                         <div class="column speed"></div>                           
@@ -37,5 +37,6 @@
     </div>
     
     <script type="module" src="/Javascript/javaScript.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </body>
 </html>

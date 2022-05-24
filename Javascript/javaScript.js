@@ -1,10 +1,27 @@
+const mainMenuBtn = document.querySelector(".mainMenu")
 var path = window.location.pathname;
 var page = path.split("/").pop();
-const mainMenuBtn = document.querySelector(".mainMenu")
+var pokemons = []
+var storedPokemons = JSON.parse(localStorage.getItem("pokemons"))
 
-mainMenuBtn.addEventListener('click', () => {
-    window.location.assign("/Pages/index.html")
-})
+//#region Other things
+if(page != 'index.html'){
+    mainMenuBtn.addEventListener('click', () => {
+        window.location.assign("/Pages/index.html")
+    })
+}
+
+
+function supports_html5_storage() {
+    try {
+      return 'localStorage' in window && window['localStorage'] !== null;
+    } catch (e) {
+      return false;
+    }
+}
+
+supports_html5_storage()
+//#endregion
 
 //#region pokedex.html
 if(page == 'pokedex.html'){
@@ -17,7 +34,13 @@ if(page == 'pokedex.html'){
           input[0].value = ''
         }
     });
-    
+}
+//#endregion
+
+//#region index.html
+if(page == 'index.html'){
+    if(storedPokemons.length > 0)
+    document.querySelector(".list").innerHTML += `<li><a href= "likedPokemons.html">Liked pokemons</a></li>`
 }
 //#endregion
 
@@ -26,10 +49,14 @@ if(page == "game.html"){
     const likeButton = document.querySelector(".like")
     const dislikeButton = document.querySelector(".dislike")
 
-    getPokemon(Math.floor(Math.random() * 899) + 1)
+    var randomNumber = Math.floor(Math.random() * 899) + 1
+    getPokemon(randomNumber)
 
     likeButton.addEventListener('click', () =>{
-    getPokemon(Math.floor(Math.random() * 899) + 1)
+        randomNumber = Math.floor(Math.random() * 899) + 1
+        getPokemon(randomNumber)
+        pokemons.push(randomNumber)
+        localStorage.setItem("pokemons", JSON.stringify(pokemons))
     })
 
     dislikeButton.addEventListener('click', () =>{
@@ -41,83 +68,85 @@ if(page == "game.html"){
 //#endregion
 
 //#region Poke API
+const colors = {
+    fire: '#FDDFDF',
+    grass: '#DEFDE0',
+    electric: '#FCF7DE',
+    water: '#DEF3FD',
+    ground: '#f4e7da',
+    rock: '#d5d5d4',
+    fairy: '#fceaff',
+    poison: '#98d7a5',
+    bug: '#f8d5a3',
+    dragon: '#97b3e6',
+    psychic: '#eaeda1',
+    flying: '#F5F5F5',
+    fighting: '#E6E0D4',
+    normal: '#F5F5F5'
+};
+const main_types = Object.keys(colors);
+
 function getPokemon(pokemonName){
-    console.log(pokemonName)
     fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
     .then((response) => response.json())
     .then((data) => {
-
-        document.querySelector(".sprite").innerHTML = `<img src="${data.sprites.other["official-artwork"].front_default}">`
-        document.querySelector(".hp").innerHTML = `<h2>HP: ${data.stats[0].base_stat} </h2>`
-        document.querySelector(".pokeName").innerHTML = `<h1>${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</h1>`
-        document.querySelector(".height").innerHTML = `<h2>${data.height / 10} m </h2>  <h3>Height</h3>`
-        document.querySelector(".weight").innerHTML =   `<h2>${data.weight / 10} kg</h2> <h3>Weight</h3>`   
+        if(page != 'likedPokemons.html'){
+            const pokemon = document.querySelector(".pokemon")
+            const poke_types = data.types[0].type.name
+            const type = main_types.find(type => poke_types.indexOf(type) > -1);
+            const color = colors[type];
+            
+            pokemon.style.backgroundColor = color
+    
+            document.querySelector(".sprite").innerHTML = `<img src="${data.sprites.other["official-artwork"].front_default}">`
+            document.querySelector(".hp").innerHTML = `<h2>HP: ${data.stats[0].base_stat} </h2>`
+            document.querySelector(".pokeName").innerHTML = `<h1>${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</h1>`
+            document.querySelector(".height").innerHTML = `<h2>${data.height / 10} m </h2>  <h3>Height</h3>`
+            document.querySelector(".weight").innerHTML =   `<h2>${data.weight / 10} kg</h2> <h3>Weight</h3>`   
+            
+            if(data.types.length == 1){
+                document.querySelector(".types").innerHTML =`
+                <h2>${data.types[0].type.name}</h2>
+                <h3>type</h3>
+                `
+            }
+            else if(data.types.length == 2){
+                document.querySelector(".types").innerHTML =`
+                <h2>${data.types[0].type.name } / ${data.types[1].type.name} </h2>           
+                <h3>type</h3>
+                `           
+            }
+    
+            document.querySelector(".attack").innerHTML = `<h2>${data.stats[1].base_stat}</h2> <h3>Attack</h3>`
+            document.querySelector(".defense").innerHTML = `<h2>${data.stats[2].base_stat}</h2> <h3>Defense</h3>`
+            document.querySelector(".speed").innerHTML = `<h2>${data.stats[5].base_stat}</h2> <h3>Speed</h3>`       
+        }
         
-        if(data.types.length == 1){
-            document.querySelector(".types").innerHTML =`
-            <h2>${data.types[0].type.name}</h2>
-            <h3>type</h3>
-            `
-        }
-        else if(data.types.length == 2){
-            document.querySelector(".types").innerHTML =`
-            <h2>${data.types[0].type.name } / ${data.types[1].type.name} </h2>
-            <h3>type</h3>
-            `           
-        }
-
-        document.querySelector(".attack").innerHTML = `<h2>${data.stats[1].base_stat}</h2> <h3>Attack</h3>`
-        document.querySelector(".defense").innerHTML = `<h2>${data.stats[2].base_stat}</h2> <h3>Defense</h3>`
-        document.querySelector(".speed").innerHTML = `<h2>${data.stats[5].base_stat}</h2> <h3>Speed</h3>`       
     })
     .catch((err) => {
-        createCustomAlert("We couldn't find the pokemon. Try a new one.")
+        $(".notify").addClass("active");
+        $("#notifyType").addClass("failure");
+  
+        setTimeout(function(){
+        $(".notify").removeClass("active");
+        $("#notifyType").removeClass("failure");
+        },3000);
     });
+}
+
+
+
+//#endregion
+
+//#region likedPokemons.Html
+
+if(page == 'likedPokemons.html'){
 }
 
 //#endregion
 
-//#region Alert
-var ALERT_TITLE = "Something went wrong";
-var ALERT_BUTTON_TEXT = "Try new";
 
-function createCustomAlert(txt) {
-    d = document
-  
-    if(d.getElementById("modalContainer")) return
-  
-    mObj = d.getElementsByTagName("body")[0].appendChild(d.createElement("div"));
-    mObj.id = "modalContainer";
-    mObj.style.height = d.documentElement.scrollHeight + "px"
-    
-    alertObj = mObj.appendChild(d.createElement("div"))
-    alertObj.id = "alertBox"
-    if(d.all && !window.opera) alertObj.style.top = document.documentElement.scrollTop + "px";
-    alertObj.style.left = (d.documentElement.scrollWidth - alertObj.offsetWidth)/2 + "px";
-    alertObj.style.visiblity="visible"
-  
-    h1 = alertObj.appendChild(d.createElement("h1"))
-    h1.appendChild(d.createTextNode(ALERT_TITLE))
-  
-    msg = alertObj.appendChild(d.createElement("p"))
-    msg.innerHTML = txt;
-  
-    btn = alertObj.appendChild(d.createElement("a"))
-    btn.id = "closeBtn"
-    btn.style.width = '100px'
-    btn.appendChild(d.createTextNode(ALERT_BUTTON_TEXT))
-    btn.href = "#"
-    btn.focus()
-    btn.onclick = function() { removeCustomAlert(); return false }
-  
-    alertObj.style.display = "block"   
-}
-  
-function removeCustomAlert() {
-    document.getElementsByTagName("body")[0].removeChild(document.getElementById("modalContainer"));
-}
+//#region Test
 
-function ful(){
-  alert('Alert this pages');
-}
+
 //#endregion
