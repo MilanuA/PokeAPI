@@ -34,53 +34,6 @@ supports_html5_storage()
 
 //#endregion
 
-//#region searchPokemon.html
-if(page == 'searchPokemon.html'){
-    $('#disableDiv').hide();
-    
-    const input = document.getElementsByName('search')
-
-    input[0].addEventListener('keypress', function(event) {
-        if (event.key === "Enter") {
-            $('#disableDiv').show();
-          event.preventDefault();
-          getPokemon(input[0].value.toLowerCase())
-          input[0].value = ''
-        }
-    });
-}
-//#endregion
-
-//#region index.html
-if(page == 'index.html'){
-    if(storedPokemons.length > 0)
-    document.querySelector(".list").innerHTML += `<li><a href= "likedPokemons.html">Liked pokemons</a></li>`
-}
-//#endregion
-
-//#region Game.html
-if(page == "game.html"){
-    const likeButton = document.querySelector(".like")
-    const dislikeButton = document.querySelector(".dislike")
-
-    var randomNumber = Math.floor(Math.random() * 899) + 1
-    getPokemon(randomNumber)
-
-    likeButton.addEventListener('click', () =>{
-        randomNumber = Math.floor(Math.random() * 899) + 1
-        getPokemon(randomNumber)
-        pokemons.push(randomNumber)
-        localStorage.setItem("pokemons", JSON.stringify(pokemons))
-    })
-
-    dislikeButton.addEventListener('click', () =>{
-        randomNumber = Math.floor(Math.random() * 899) + 1
-        getPokemon(Math.floor(Math.random() * 899) + 1)
-    })
-}
-
-//#endregion
-
 //#region Poke API
 //#region  Pokemon Color
 const colors = {
@@ -111,12 +64,27 @@ function pokemonColor(pokemon){
 }
 //#endregion
 
+const getAbility = async name =>{
+    $(".moreInfo").html('')
+
+    try{
+        const url =  `https://pokeapi.co/api/v2/ability/${name}/`
+        const res = await fetch(url)
+        const abilityData = await res.json()
+
+        showInfo(abilityData)
+    }
+    catch(err){
+        showError()
+    }
+}
+
 const getPokemon = async pokemonName =>{
     try{
         const url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
         const res = await fetch(url)
         const data = await res.json()
-        
+
         createPokemon(data)
     }
     catch(err){
@@ -125,6 +93,7 @@ const getPokemon = async pokemonName =>{
 }
 
 function createPokemon(data){
+ //#region  variables
     const sprite = data.sprites.other["official-artwork"].front_default
     const hp = data.stats[0].base_stat
     const name = data.name.charAt(0).toUpperCase() + data.name.slice(1)
@@ -133,71 +102,129 @@ function createPokemon(data){
     const attack = data.stats[1].base_stat
     const defense = data.stats[2].base_stat
     const speed = data.stats[5].base_stat
-    
-    if(page != 'likedPokemons.html'){
-        const pokemon = document.querySelector(".pokemon")         
-        pokemon.style.backgroundColor = pokemonColor(data)
-    
-        document.querySelector(".sprite").innerHTML = `<img src="${sprite}">`
-        document.querySelector(".hp").innerHTML = `<h2>HP: ${hp} </h2>`
-        document.querySelector(".pokeName").innerHTML = `<h1>${name}</h1>`
-        document.querySelector(".height").innerHTML = `<h2>${height} m </h2>  <h3>Height</h3>`
-        document.querySelector(".weight").innerHTML =  `<h2>${weight} kg</h2> <h3>Weight</h3>`   
-        
-        if(data.types.length == 1){
-            document.querySelector(".types").innerHTML =`
-            <h2>${data.types[0].type.name}</h2>
-            <h3>type</h3>
-            `
-        }
-        else if(data.types.length == 2){
-            document.querySelector(".types").innerHTML =`
-            <h2>${data.types[0].type.name } / ${data.types[1].type.name} </h2>           
-            <h3>type</h3> `           
-        }
-    
-        document.querySelector(".attack").innerHTML = `<h2>${attack}</h2> <h3>Attack</h3>`
-        document.querySelector(".defense").innerHTML = `<h2>${defense}</h2> <h3>Defense</h3>`
-        document.querySelector(".speed").innerHTML = `<h2>${speed}</h2> <h3>Speed</h3>`       
-    }
-    
-    if(page == 'likedPokemons.html'){
-        createPokemonCard(data)
-    }
-}
+    const id = data.id.toString()
 //#endregion
 
-//#region likedPokemons.Html
-if(page == 'likedPokemons.html'){
-    function showPokemons(){
-        for(let i = 0; i < storedPokemons.length; i++){
-            getPokemon(storedPokemons[i])
+    if(page != 'likedPokemons.html'){
+        $(".pokemon").css({"backgroundColor" : pokemonColor(data) })
+        $(".sprite").html(`<img src="${sprite}">`)
+        $(".hp").html(`<h2>HP: ${hp} </h2>`)
+        $(".pokeName").html(`<h1>${name}</h1>`)
+        $(".height").html(`<h2>${height} m </h2>  <h3>Height</h3>`) 
+        $(".weight").html(`<h2>${weight} kg</h2> <h3>Weight</h3>` )  
+        
+        $(".spriteHolder").css({
+            "background-color" : "rgba(255, 255, 255, 0.6",
+            "border-radius" : "50%",
+            "width" : "320px",
+            "height" : "320px",
+            "margin-left" : "auto",
+            "margin-right" : "auto"
+        })
+
+        if(data.types.length == 1){
+           $(".types").html(`
+            <h2>${data.types[0].type.name}</h2>
+            <h3>type</h3>
+            `)
         }
+        else if(data.types.length == 2){
+            $(".types").html(`
+            <h2>${data.types[0].type.name } / ${data.types[1].type.name} </h2>           
+            <h3>type</h3> 
+            `)       
+        }
+    
+        $(".attack").html(`<h2>${attack}</h2> <h3>Attack</h3>`)
+        $(".defense").html(`<h2>${defense}</h2> <h3>Defense</h3>`)
+        $(".speed").html(`<h2>${speed}</h2> <h3>Speed</h3>`)  
+
+        getAbility(data.abilities[0].ability.name)    
+        getAbility(data.abilities[1].ability.name)
     }
-
-    function createPokemonCard(pokemon) {
-        const pokemonEl = document.createElement('div');
-        pokemonEl.classList.add('pokemon');
-
-        const name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-        const sprite =pokemon.sprites.other["official-artwork"].front_default
-
-        pokemonEl.style.backgroundColor = pokemonColor(pokemon)
+   
+    
+    if(page == 'likedPokemons.html'){
+        const pokemonEl = document.createElement('div')
+        pokemonEl.classList.add('pokemon')
+        pokemonEl.style.backgroundColor = pokemonColor(data)
     
         const pokeInnerHTML = `
             <div class="img-container">
                 <img src="${sprite}">
             </div>
             <div class="info">
-                <span class="number">#${pokemon.id.toString().padStart(3, '0')}</span>              
+                <span class="number">#${id.padStart(3, '0')}</span>              
                 <h3 class="name">${name}</h3>
             </div>
         `;
     
-        pokemonEl.innerHTML = pokeInnerHTML;  
-        poke_container.appendChild(pokemonEl);
+        pokemonEl.innerHTML = pokeInnerHTML
+        $(".poke-container").append(pokemonEl)
     }
+}
+
+function showInfo(data){
+    const abilityElement = document.createElement('div')
+    abilityElement.classList.add('ability')
+
+    const abilityInnerHTML = `
+    <h2>${data.name.toUpperCase()}</h2>
+    <h3>${data.effect_entries[1].effect}</h3>
+    `;
+
+    abilityElement.innerHTML = abilityInnerHTML
+    $(".moreInfo").append(abilityElement)
+}
+//#endregion
+
+//#region likedPokemons.Html
+if(page == 'likedPokemons.html'){
+    function showPokemons(){
+        for(let i = 0; i < storedPokemons.length; i++)
+            getPokemon(storedPokemons[i])
+    }
+
     showPokemons()
 }
 //#endregion
 
+//#region searchPokemon.html
+if(page == 'searchPokemon.html'){
+    const input = $(".searchBar")
+
+    $(document).ready(function() {
+        $('.searchBar').keypress(function (e) {
+            var key = e.which;
+            if(key == 13)  
+             {
+               $('input[name = butAssignProd]').click();
+                getPokemon(input.val().toLowerCase())
+                input.val('')
+             }
+        }) 
+    })
+}
+//#endregion
+
+//#region Game.html
+if(page == "game.html"){
+    var randomNumber = Math.floor(Math.random() * 899) + 1
+    getPokemon(randomNumber)
+
+    $(document).ready(function() {
+        $(".like").click(function(){
+            randomNumber = Math.floor(Math.random() * 899) + 1
+            getPokemon(randomNumber)
+            pokemons.push(randomNumber)
+            localStorage.setItem("pokemons", JSON.stringify(pokemons))
+        }); 
+
+        $(".dislike").click(function(){
+            randomNumber = Math.floor(Math.random() * 899) + 1
+            getPokemon(Math.floor(Math.random() * 899) + 1)
+        }); 
+    });
+}
+
+//#endregion
