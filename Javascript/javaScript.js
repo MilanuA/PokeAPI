@@ -20,7 +20,18 @@ function supports_html5_storage() {
     }
 }
 
+function showError(){
+    $(".notify").addClass("active");
+    $("#notifyType").addClass("failure");
+
+    setTimeout(function(){
+    $(".notify").removeClass("active");
+    $("#notifyType").removeClass("failure");
+    },3000);
+}
 supports_html5_storage()
+
+
 //#endregion
 
 //#region searchPokemon.html
@@ -71,6 +82,7 @@ if(page == "game.html"){
 //#endregion
 
 //#region Poke API
+//#region  Pokemon Color
 const colors = {
     fire: '#FDDFDF',
     grass: '#DEFDE0',
@@ -89,7 +101,6 @@ const colors = {
 };
 const main_types = Object.keys(colors);
 
-//#region  Pokemon Color
 function pokemonColor(pokemon){
     const poke_types = pokemon.types.map(type => type.type.name)
     const type = main_types.find(type => poke_types.indexOf(type) > -1)
@@ -100,64 +111,60 @@ function pokemonColor(pokemon){
 }
 //#endregion
 
-function getPokemon(pokemonName){
-    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
-    .then((response) => response.json())
-    .then((data) => {
-        const sprite = data.sprites.other["official-artwork"].front_default
-        const hp = data.stats[0].base_stat
-        const name = data.name.charAt(0).toUpperCase() + data.name.slice(1)
-        const height = data.height / 10
-        const weight = data.weight / 10
-        const attack = data.stats[1].base_stat
-        const defense = data.stats[2].base_stat
-        const speed = data.stats[5].base_stat
-
-        if(page != 'likedPokemons.html'){
-            const pokemon = document.querySelector(".pokemon")         
-            pokemon.style.backgroundColor = pokemonColor(data)
-    
-            document.querySelector(".sprite").innerHTML = `<img src="${sprite}">`
-            document.querySelector(".hp").innerHTML = `<h2>HP: ${hp} </h2>`
-            document.querySelector(".pokeName").innerHTML = `<h1>${name}</h1>`
-            document.querySelector(".height").innerHTML = `<h2>${height} m </h2>  <h3>Height</h3>`
-            document.querySelector(".weight").innerHTML =  `<h2>${weight} kg</h2> <h3>Weight</h3>`   
-            
-            if(data.types.length == 1){
-                document.querySelector(".types").innerHTML =`
-                <h2>${data.types[0].type.name}</h2>
-                <h3>type</h3>
-                `
-            }
-            else if(data.types.length == 2){
-                document.querySelector(".types").innerHTML =`
-                <h2>${data.types[0].type.name } / ${data.types[1].type.name} </h2>           
-                <h3>type</h3> `           
-            }
-    
-            document.querySelector(".attack").innerHTML = `<h2>${attack}</h2> <h3>Attack</h3>`
-            document.querySelector(".defense").innerHTML = `<h2>${defense}</h2> <h3>Defense</h3>`
-            document.querySelector(".speed").innerHTML = `<h2>${speed}</h2> <h3>Speed</h3>`       
-        }
-
-        if(page == 'likedPokemons.html'){
-            createPokemonCard(data)
-        }
+const getPokemon = async pokemonName =>{
+    try{
+        const url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
+        const res = await fetch(url)
+        const data = await res.json()
         
-    })
-    .catch((err) => {
-        $(".notify").addClass("active");
-        $("#notifyType").addClass("failure");
-  
-        setTimeout(function(){
-        $(".notify").removeClass("active");
-        $("#notifyType").removeClass("failure");
-        },3000);
-    });
+        createPokemon(data)
+    }
+    catch(err){
+        showError()
+    }
 }
 
-
-
+function createPokemon(data){
+    const sprite = data.sprites.other["official-artwork"].front_default
+    const hp = data.stats[0].base_stat
+    const name = data.name.charAt(0).toUpperCase() + data.name.slice(1)
+    const height = data.height / 10
+    const weight = data.weight / 10
+    const attack = data.stats[1].base_stat
+    const defense = data.stats[2].base_stat
+    const speed = data.stats[5].base_stat
+    
+    if(page != 'likedPokemons.html'){
+        const pokemon = document.querySelector(".pokemon")         
+        pokemon.style.backgroundColor = pokemonColor(data)
+    
+        document.querySelector(".sprite").innerHTML = `<img src="${sprite}">`
+        document.querySelector(".hp").innerHTML = `<h2>HP: ${hp} </h2>`
+        document.querySelector(".pokeName").innerHTML = `<h1>${name}</h1>`
+        document.querySelector(".height").innerHTML = `<h2>${height} m </h2>  <h3>Height</h3>`
+        document.querySelector(".weight").innerHTML =  `<h2>${weight} kg</h2> <h3>Weight</h3>`   
+        
+        if(data.types.length == 1){
+            document.querySelector(".types").innerHTML =`
+            <h2>${data.types[0].type.name}</h2>
+            <h3>type</h3>
+            `
+        }
+        else if(data.types.length == 2){
+            document.querySelector(".types").innerHTML =`
+            <h2>${data.types[0].type.name } / ${data.types[1].type.name} </h2>           
+            <h3>type</h3> `           
+        }
+    
+        document.querySelector(".attack").innerHTML = `<h2>${attack}</h2> <h3>Attack</h3>`
+        document.querySelector(".defense").innerHTML = `<h2>${defense}</h2> <h3>Defense</h3>`
+        document.querySelector(".speed").innerHTML = `<h2>${speed}</h2> <h3>Speed</h3>`       
+    }
+    
+    if(page == 'likedPokemons.html'){
+        createPokemonCard(data)
+    }
+}
 //#endregion
 
 //#region likedPokemons.Html
