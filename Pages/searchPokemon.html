@@ -9,13 +9,14 @@
     <link rel="stylesheet" type="text/css" href="/CSS/style.css" />
 </head>
 <body>
-    <div class="notify"><span id="notifyType" class=""></span></div>
+    
     <div class="row">
-        <div class="column">
-            <div class="searchBar pokedexContainer">
-                <button type="button" class="mainMenu">Main Menu</button> 
-                <input type="text" placeholder="Search pokemon" name="search">
-            </div>
+        
+        <div class="column ">
+            <button type="button" class="mainMenu button-85" role="button">Main Menu</button> 
+        </div>
+        <div class="column">    
+            <input type="text" placeholder="🔎 Search pokemon" class="button-85 searchBar">   
             <div class="pokemon" id="pokemonElement">
                 <div class="spriteHolder">
                     <div class="sprite" id="disableDiv" ></div> 
@@ -35,8 +36,19 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="column">
+            <div class="additionalInfo">
+                <h1> Abilities </h1>
+                <div class="moreInfo">
+
+                </div>
+            </div>
+        </div>
     </div>
     
+    <div class="notify"><span id="notifyType" class=""></span></div>
+
     <script type="module" src="/Javascript/javaScript.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </body>
