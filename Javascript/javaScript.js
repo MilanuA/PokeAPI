@@ -89,6 +89,17 @@ const colors = {
 };
 const main_types = Object.keys(colors);
 
+//#region  Pokemon Color
+function pokemonColor(pokemon){
+    const poke_types = pokemon.types.map(type => type.type.name)
+    const type = main_types.find(type => poke_types.indexOf(type) > -1)
+    
+    const color = colors[type]
+
+    return color
+}
+//#endregion
+
 function getPokemon(pokemonName){
     fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
     .then((response) => response.json())
@@ -103,11 +114,8 @@ function getPokemon(pokemonName){
         const speed = data.stats[5].base_stat
 
         if(page != 'likedPokemons.html'){
-            const pokemon = document.querySelector(".pokemon")
-            const poke_types = data.types[0].type.name
-            const type = main_types.find(type => poke_types.indexOf(type) > -1);
-            const color = colors[type];          
-            pokemon.style.backgroundColor = color
+            const pokemon = document.querySelector(".pokemon")         
+            pokemon.style.backgroundColor = pokemonColor(data)
     
             document.querySelector(".sprite").innerHTML = `<img src="${sprite}">`
             document.querySelector(".hp").innerHTML = `<h2>HP: ${hp} </h2>`
@@ -153,7 +161,6 @@ function getPokemon(pokemonName){
 //#endregion
 
 //#region likedPokemons.Html
-
 if(page == 'likedPokemons.html'){
     function showPokemons(){
         for(let i = 0; i < storedPokemons.length; i++){
@@ -164,14 +171,11 @@ if(page == 'likedPokemons.html'){
     function createPokemonCard(pokemon) {
         const pokemonEl = document.createElement('div');
         pokemonEl.classList.add('pokemon');
-    
-        const poke_types = pokemon.types.map(type => type.type.name)
-        const type = main_types.find(type => poke_types.indexOf(type) > -1)
+
         const name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-        const color = colors[type]
         const sprite =pokemon.sprites.other["official-artwork"].front_default
 
-        pokemonEl.style.backgroundColor = color;
+        pokemonEl.style.backgroundColor = pokemonColor(pokemon)
     
         const pokeInnerHTML = `
             <div class="img-container">
@@ -188,5 +192,5 @@ if(page == 'likedPokemons.html'){
     }
     showPokemons()
 }
-
 //#endregion
+
