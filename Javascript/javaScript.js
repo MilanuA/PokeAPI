@@ -165,15 +165,20 @@ function createPokemon(data){
         $(".hatchTime").html(`${moreInfo.hatch_counter * 253} steps`)
         $(".captureInfo").html(`${moreInfo.capture_rate}`)
 
-        let femaleRatio = (100 / 8) * moreInfo.gender_rate
-        $(".progress").css({
-            "height":30,
-            "width" :250,
-            "border" : "2px solid #000",        
-            "background" : `linear-gradient(to right,rgb(255, 0, 179) 20% ${femaleRatio}%,  blue 10% 20%)`       
-        })
-
-        $(".genderText").html(`female: ${femaleRatio}%  ‎ ‏ ‏ male: ${100 - femaleRatio}%`)
+        if(moreInfo.gender_rate != -1){
+            let femaleRatio = (100 / 8) * moreInfo.gender_rate
+            $(".progress").css({
+                "height":30,
+                "width" :250,
+                "border" : "2px solid #000",  
+                "background" : `linear-gradient(to right,rgb(255, 0, 179) 20% ${femaleRatio}%,  blue 10% 20%)`       
+            })
+    
+            
+                $(".genderText").html(`female: ${femaleRatio}%  ‎ ‏ ‏ male: ${100 - femaleRatio}%`)
+        }
+        else
+            $(".genderText").html("genderless")
     }
    
     
