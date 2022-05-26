@@ -180,12 +180,59 @@ function showInfo(data){
 
 //#region likedPokemons.Html
 if(page == 'likedPokemons.html'){
+
     function showPokemons(){
-        for(let i = 0; i < storedPokemons.length; i++)
+        for(let i = 0; i < storedPokemons.length; i++){
             getPokemon(storedPokemons[i])
+        }
     }
 
+
     showPokemons()
+
+    $(document).ready(function() {
+        $('.searchBar').keypress(function (e) {
+            var key = e.which;
+            if(key == 13)  
+             {
+               $('input[name = butAssignProd]').click();
+                getPokemon(input.val().toLowerCase())
+                input.val('')
+             }
+        }) 
+    })
+    
+    //#region  Sorting
+    $("#sort").on('change', function(){
+        var selectedVal = $(this).val();
+        switch(selectedVal){
+            case 'ascending':
+                ascending()
+            break;
+            case 'descending':
+                descending()
+            break;
+        }
+    });
+
+    function ascending(){
+        $(".poke-container").html('')
+        storedPokemons.sort(function(a, b){return a-b})
+        pokemons = storedPokemons
+        showPokemons()
+
+        localStorage.setItem("pokemons", JSON.stringify(pokemons))
+    }
+
+    function descending(){
+        $(".poke-container").html('')
+        storedPokemons.sort(function(a, b){return b-a})
+        pokemons = storedPokemons
+        showPokemons()
+
+        localStorage.setItem("pokemons", JSON.stringify(pokemons))
+    }
+    //#endregion
 }
 //#endregion
 
