@@ -64,6 +64,22 @@ function pokemonColor(pokemon){
 }
 //#endregion
 
+const getPokemon = async pokemonName =>{
+    try{
+        const url1 = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
+        const url2 = `https://pokeapi.co/api/v2/pokemon-species/${pokemonName}/ `
+     
+        const results = Promise.all([fetch(url1), fetch(url2)])
+        const dataPromises = (await results).map(results => results.json())
+        const finalData = Promise.all(dataPromises).then(finalData =>createPokemon(finalData))
+    }
+    catch(err){
+        showError()
+    }
+   
+}
+
+
 const getAbility = async name =>{
     $(".moreInfo").html('')
 
@@ -79,34 +95,26 @@ const getAbility = async name =>{
     }
 }
 
-const getPokemon = async pokemonName =>{
-    try{
-        const url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
-        const res = await fetch(url)
-        const data = await res.json()
-
-        createPokemon(data)
-    }
-    catch(err){
-        showError()
-    }
-}
-
 function createPokemon(data){
- //#region  variables
-    const sprite = data.sprites.other["official-artwork"].front_default
-    const hp = data.stats[0].base_stat
-    const name = data.name.charAt(0).toUpperCase() + data.name.slice(1)
-    const height = data.height / 10
-    const weight = data.weight / 10
-    const attack = data.stats[1].base_stat
-    const defense = data.stats[2].base_stat
-    const speed = data.stats[5].base_stat
-    const id = data.id.toString()
-//#endregion
+    const basicData = data[0]
+    const moreInfo = data[1]
+
+    console.log(moreInfo)
+    //#region  variables
+    const sprite = basicData.sprites.other["official-artwork"].front_default
+    const hp = basicData.stats[0].base_stat
+    const name = basicData.name.charAt(0).toUpperCase() + basicData.name.slice(1)
+    const height = basicData.height / 10
+    const weight = basicData.weight / 10
+    const attack = basicData.stats[1].base_stat
+    const defense = basicData.stats[2].base_stat
+    const speed = basicData.stats[5].base_stat
+    const id = basicData.id.toString()
+    const type = basicData.types
+    //#endregion
 
     if(page != 'likedPokemons.html'){
-        $(".pokemon").css({"backgroundColor" : pokemonColor(data) })
+        $(".pokemon").css({"backgroundColor" : pokemonColor(data[0]) })
         $(".sprite").html(`<img src="${sprite}">`)
         $(".hp").html(`<h2>HP: ${hp} </h2>`)
         $(".pokeName").html(`<h1>${name}</h1>`)
@@ -122,15 +130,15 @@ function createPokemon(data){
             "margin-right" : "auto"
         })
 
-        if(data.types.length == 1){
+        if(type.length == 1){
            $(".types").html(`
-            <h2>${data.types[0].type.name}</h2>
+            <h2>${type[0].type.name}</h2>
             <h3>type</h3>
             `)
         }
-        else if(data.types.length == 2){
+        else if(type.length == 2){
             $(".types").html(`
-            <h2>${data.types[0].type.name } / ${data.types[1].type.name} </h2>           
+            <h2>${type[0].type.name } / ${type[1].type.name} </h2>           
             <h3>type</h3> 
             `)       
         }
@@ -139,15 +147,40 @@ function createPokemon(data){
         $(".defense").html(`<h2>${defense}</h2> <h3>Defense</h3>`)
         $(".speed").html(`<h2>${speed}</h2> <h3>Speed</h3>`)  
 
-        getAbility(data.abilities[0].ability.name)    
-        getAbility(data.abilities[1].ability.name)
+        for(let i = 0; i < basicData.abilities.length; i++){
+            getAbility(basicData.abilities[i].ability.name)    
+        }
+
+        if(moreInfo.egg_groups.length == 1){
+            $(".eggGroup").html(`
+            <h3>${moreInfo.egg_groups[0].name}</h3>          
+            `)
+        }
+        else if(moreInfo.egg_groups.length == 2){
+            $(".eggGroup").html(`   
+            <h3>${moreInfo.egg_groups[0].name} and ${moreInfo.egg_groups[1].name}</h3>          
+            `)
+        }
+        
+        $(".hatchTime").html(`${moreInfo.hatch_counter * 253} steps`)
+        $(".captureInfo").html(`${moreInfo.capture_rate}`)
+
+        let femaleRatio = (100 / 8) * moreInfo.gender_rate
+        $(".progress").css({
+            "height":30,
+            "width" :250,
+            "border" : "2px solid #000",        
+            "background" : `linear-gradient(to right,rgb(255, 0, 179) 20% ${femaleRatio}%,  blue 10% 20%)`       
+        })
+
+        $(".genderText").html(`female: ${femaleRatio}%  ‎ ‏ ‏ male: ${100 - femaleRatio}%`)
     }
    
     
     if(page == 'likedPokemons.html'){
         const pokemonEl = document.createElement('div')
         pokemonEl.classList.add('pokemon')
-        pokemonEl.style.backgroundColor = pokemonColor(data)
+        pokemonEl.style.backgroundColor = pokemonColor(basicData)
     
         const pokeInnerHTML = `
             <div class="img-container">
@@ -201,7 +234,7 @@ if(page == 'likedPokemons.html'){
              }
         }) 
     })
-    
+
     //#region  Sorting
     $("#sort").on('change', function(){
         var selectedVal = $(this).val();
