@@ -91,7 +91,7 @@ const getAbility = async name =>{
         showInfo(abilityData)
     }
     catch(err){
-        showError()
+        // showError()
     }
 }
 
@@ -147,9 +147,12 @@ function createPokemon(data){
         $(".defense").html(`<h2>${defense}</h2> <h3>Defense</h3>`)
         $(".speed").html(`<h2>${speed}</h2> <h3>Speed</h3>`)  
 
-        for(let i = 0; i < basicData.abilities.length; i++){
-            getAbility(basicData.abilities[i].ability.name)    
+        if(basicData.abilities.length > 0){
+            for(let i = 0; i < basicData.abilities.length; i++){
+                getAbility(basicData.abilities[i].ability.name)    
+            }
         }
+       
 
         if(moreInfo.egg_groups.length == 1){
             $(".eggGroup").html(`
@@ -177,8 +180,11 @@ function createPokemon(data){
             
                 $(".genderText").html(`female: ${femaleRatio}%  ‎ ‏ ‏ male: ${100 - femaleRatio}%`)
         }
-        else
+        else{
+            $(".progress").empty()
             $(".genderText").html("genderless")
+        }
+           
     }
    
     
